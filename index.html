@@ -50,17 +50,25 @@ h2{font-size:1rem;margin:0 0 8px}
 <div class="wrap" id="app"></div>
 <script>
 const T={
- nl:{seen:'Gezien van binnen — zo monteren',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
- en:{seen:'Seen from inside — fit like this',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
- tr:{seen:'İçeriden görünüm — böyle monte et',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
- ar:{seen:'منظور من جوا — هيك بتركّب',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
+ nl:{half:'½ = 1 stuk voor 2 kozijnen (gehalveerd)',seen:'Gezien van binnen — zo monteren',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
+ en:{half:'½ = one piece for 2 frames (halved)',seen:'Seen from inside — fit like this',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
+ tr:{half:'½ = 2 kasa için 1 parça (ikiye bölünür)',seen:'İçeriden görünüm — böyle monte et',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
+ ar:{half:'½ = قطعة وحدة لشباكين (بتنقسم)',seen:'منظور من جوا — هيك بتركّب',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function decode(h){ // #<base64url of UTF-8 JSON>
   const b=h.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b+'==='.slice((b.length+3)%4));
   return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
 }
 let D=null, lang='nl';
-try{ const h=location.hash.slice(1); if(h){ const a=decode(h); D={v:a[0],lang:a[1],project:a[2],code:a[3],W:a[4],H:a[5],b:a[6],h:a[7],pos:a[8],qty:a[9],parts:a[10]||[],mats:a[11]||[],vent:a[12]||'',type:a[13]||''}; lang=T[D.lang]?D.lang:'nl'; } }catch(e){ D={bad:true}; }
+// v2 (short): 2!lang!project!code!W!H!block!house!pos!qty!A~prof~len~n~sides,…!name~q,…!vent   ·  v1: base64 JSON
+const un=x=>decodeURIComponent(String(x||'').replace(/_/g,' '));
+function parse2(h){ const F=h.split('!'); const num=x=>x===''?null:(x==='.5'?0.5:+x);
+  return {v:2,lang:un(F[1]),project:un(F[2]),code:un(F[3]),W:un(F[4]),H:un(F[5]),b:un(F[6]),h:un(F[7]),pos:un(F[8]),qty:un(F[9]),
+    parts:(F[10]?F[10].split(','):[]).map(x=>{ const q=x.split('~').map(un); return [q[0],q[1],q[2]===''?null:q[2],num(q[3]),q[4]]; }),
+    mats:(F[11]?F[11].split(','):[]).map(x=>x.split('~').map(un)),vent:un(F[12]),type:''}; }
+try{ let h=location.hash.slice(1); try{ if(/%21|%7E/i.test(h)) h=decodeURIComponent(h); }catch(x){}
+  if(h){ if(/^2!/.test(h)) D=parse2(h); else { const a=decode(h); D={v:a[0],lang:a[1],project:a[2],code:a[3],W:a[4],H:a[5],b:a[6],h:a[7],pos:a[8],qty:a[9],parts:a[10]||[],mats:a[11]||[],vent:a[12]||'',type:a[13]||''}; }
+    lang=T[D.lang]?D.lang:'nl'; } }catch(e){ D={bad:true}; }
 try{ const l=localStorage.getItem('lm-lang'); if(T[l]) lang=l; }catch(e){}
 function drawing(){ // frame to scale, letters on the side where each piece goes (seen from inside)
   const W=+D.W||1000,H=+D.H||1000,box=180,s=box/Math.max(W,H),rw=W*s,rh=H*s,x=(300-rw)/2,y=(300-rh)/2;
@@ -82,7 +90,7 @@ function render(){
   const brand=`<div class="brand"><span><b>LANDSLAKE</b> Kozijnen &amp; Gevelbouw</span>${langs}</div>`;
   if(!D||D.bad){ document.getElementById('app').innerHTML=brand+`<div class="card empty">${esc(D&&D.bad?t.bad:t.none)}</div>`; return; }
   const parts=D.parts.map(p=>`<div class="part"><div class="let">${esc(p[0])}</div>
-      <div><div class="pname">${esc(p[1])}</div><div class="chips">${[...String(p[4]||'')].filter(c=>'LRTB'.includes(c)).map(c=>`<span class="chip">${esc(t[c])}</span>`).join('')}</div>${p[5]?`<div class="note">${esc(p[5])}</div>`:''}</div>
+      <div><div class="pname">${esc(p[1])}</div><div class="chips">${[...String(p[4]||'')].filter(c=>'LRTB'.includes(c)).map(c=>`<span class="chip">${esc(t[c])}</span>`).join('')}</div>${p[5]?`<div class="note">${esc(p[5])}</div>`:p[3]===0.5?`<div class="note">${esc(t.half)}</div>`:''}</div>
       <div class="right"><div class="len">${p[2]!=null?esc(p[2])+' <small>mm</small>':`<small>${esc(t.tbd)}</small>`}</div><div class="qty">× ${esc(nf(p[3]))}</div></div></div>`).join('');
   const mats=D.mats.map(m=>`<div class="mat"><span>${esc(m[0])}</span><b>× ${esc(m[1])}</b></div>`).join('')+(D.vent?`<div class="mat"><span>🌬 ${esc(t.vent)}: ${esc(D.vent)}</span><b>× 1</b></div>`:'');
   document.getElementById('app').innerHTML=brand+`
