@@ -96,7 +96,7 @@ const letsOf=p=>String(p[0]||'').match(/[A-Z]\d?/g)||[String(p[0]||'')];
 const faceLets=(out,side)=>[...new Set(D.parts.filter(p=>isOut(p)===out).flatMap(p=>{ const L=letsOf(p), sd=String(p[4]||''); return [...sd].map((c,i)=>c===side?(L[i]||L[0]):null).filter(Boolean); }))].join(' ');
 // real drawing seen from inside with the inside letters, and the mirrored drawing seen from outside with A1, B1…
 function picture(){
-  const one=(mirror)=>{ const lets=side=>faceLets(mirror,side); let L=lets('L'),R=lets('R'); if(mirror)[L,R]=[R,L];
+  const one=(mirror)=>{ const fx=mirror?{T:'A',L:'B',R:'C',B:'D'}:{T:'A1',L:'B1',R:'C1',B:'D1'}; const lets=side=>faceLets(mirror,side)||(D.v===3&&side!=='E'?fx[{L:mirror?'R':'L',R:mirror?'L':'R'}[side]||side]:''); let L=lets('L'),R=lets('R'); if(mirror)[L,R]=[R,L];
     return `<div class="pic${mirror?' out':''}"><div class="pt">${esc(lets('T'))}</div><div class="pm"><span>${esc(L)}</span><div class="pw">${mirror
       ? `<img src="img/${D.img}-out.jpg" alt="" onerror="this.onerror=null;this.src='img/${D.img}.jpg';this.style.transform='scaleX(-1)'"><b class="plbl">${esc(D.code)}</b>`
       : `<img src="img/${D.img}.jpg" alt="" onerror="this.closest('.pics').outerHTML=views()">`}</div><span>${esc(R)}</span></div><div class="pt">${esc(lets('B'))}</div>${!mirror&&D.v===3?`<div class="pdash"></div><div class="pt">${esc(lets('E')||'E')}</div>`:''}</div>`; };
@@ -104,7 +104,7 @@ function picture(){
 }
 function drawing(out){ // frame to scale, letters on the side where each piece goes (inside view, or mirrored outside view)
   const W=+D.W||1000,H=+D.H||1000,box=180,s=box/Math.max(W,H),rw=W*s,rh=H*s,x=(300-rw)/2,y=(300-rh)/2-(!out&&D.v===3?22:0);
-  const lets=side=>faceLets(!!out,side), C=D.v===3?(out?'var(--glass)':'#c00000'):(out?'#c2410c':'var(--glass)');
+  const fx=!!out?{T:'A',L:'B',R:'C',B:'D'}:{T:'A1',L:'B1',R:'C1',B:'D1'}, lets=side=>faceLets(!!out,side)||(D.v===3?fx[{L:out?'R':'L',R:out?'L':'R'}[side]||side]:''), C=D.v===3?(out?'var(--glass)':'#c00000'):(out?'#c2410c':'var(--glass)');
   const Tt=lets('T'),Bb=lets('B'); let Ll=lets('L'),Rr=lets('R'); if(out)[Ll,Rr]=[Rr,Ll];
   return `<svg viewBox="0 0 300 300" role="img" aria-label="${W} x ${H}" style="direction:ltr">
     <rect x="${x}" y="${y}" width="${rw}" height="${rh}" rx="2" fill="${out?'#fff3e6':'var(--glass-soft)'}" stroke="var(--frame)" stroke-width="5"${out?' stroke-dasharray="10 6"':''}/>
