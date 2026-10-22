@@ -39,6 +39,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",sy
 .draw .seen.out{color:#c2410c}
 .draw .seen{margin-bottom:10px}
 .let.out{background:#c2410c}
+.let.many{font-size:1rem;line-height:1.1;text-align:center;padding:2px}
 .face{display:inline-block;font-weight:800;font-size:.9rem;border-radius:8px;padding:2px 10px;margin:8px 0 2px;background:var(--glass-soft);color:var(--ink)}
 .face.out{background:#fde4d0;color:#9a3412}
 h2{font-size:1rem;margin:0 0 8px}
@@ -63,10 +64,10 @@ h2{font-size:1rem;margin:0 0 8px}
 <div class="wrap" id="app"></div>
 <script>
 const T={
- nl:{inH:'Binnen — A, B, C…',outH:'Buiten — A1, B1, C1…',out:'Gezien van buiten',half:'½ = 1 stuk voor 2 kozijnen (gehalveerd)',seen:'Gezien van binnen — zo monteren',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
- en:{inH:'Inside — A, B, C…',outH:'Outside — A1, B1, C1…',out:'Seen from outside',half:'½ = one piece for 2 frames (halved)',seen:'Seen from inside — fit like this',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
- tr:{inH:'İç — A, B, C…',outH:'Dış — A1, B1, C1…',out:'Dışarıdan görünüm',half:'½ = 2 kasa için 1 parça (ikiye bölünür)',seen:'İçeriden görünüm — böyle monte et',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
- ar:{inH:'من جوّا — A, B, C…',outH:'من برّا — A1, B1, C1…',out:'منظور من برا',half:'½ = قطعة وحدة لشباكين (بتنقسم)',seen:'منظور من جوا — هيك بتركّب',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
+ nl:{inH:'Binnen: A boven · B links · C rechts · D onder · E onder vensterbank',outH:'Buiten: A1 boven · B1 links · C1 rechts · D1 onder',out:'Buitenaanzicht — AFDICHTING',half:'½ = 1 stuk voor 2 kozijnen (gehalveerd)',seen:'Binnenaanzicht / Afwerking — Finishing',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
+ en:{inH:'Inside: A top · B left · C right · D bottom · E under the sill',outH:'Outside: A1 top · B1 left · C1 right · D1 bottom',out:'Buitenaanzicht — AFDICHTING (outside)',half:'½ = one piece for 2 frames (halved)',seen:'Binnenaanzicht / Afwerking — Finishing (inside)',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
+ tr:{inH:'İç: A üst · B sol · C sağ · D alt · E denizlik altı',outH:'Dış: A1 üst · B1 sol · C1 sağ · D1 alt',out:'Buitenaanzicht — AFDICHTING (dış)',half:'½ = 2 kasa için 1 parça (ikiye bölünür)',seen:'Binnenaanzicht / Afwerking — Finishing (iç)',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
+ ar:{inH:'جوّا: A فوق · B يسار · C يمين · D تحت · E تحت الـ Vensterbank',outH:'برّا: A1 فوق · B1 يسار · C1 يمين · D1 تحت',out:'Buitenaanzicht — AFDICHTING (من برّا)',half:'½ = قطعة وحدة لشباكين (بتنقسم)',seen:'Binnenaanzicht / Afwerking — Finishing (من جوّا)',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function decode(h){ // #<base64url of UTF-8 JSON>
   const b=h.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b+'==='.slice((b.length+3)%4));
@@ -84,15 +85,17 @@ try{ let h=location.hash.slice(1); try{ if(/%21|%7E/i.test(h)) h=decodeURICompon
     lang=T[D.lang]?D.lang:'nl'; } }catch(e){ D={bad:true}; }
 try{ const l=localStorage.getItem('lm-lang'); if(T[l]) lang=l; }catch(e){}
 // letters ending in a digit (A1, B1…) are fitted on the outside, plain letters (A, B…) inside
-const isOut=p=>/\d$/.test(String(p[0]||''));
-const faceLets=(out,side)=>D.parts.filter(p=>isOut(p)===out&&String(p[4]||'').includes(side)).map(p=>p[0]).join(' ');
+const isOut=p=>/\d/.test(String(p[0]||''));
+// "B1C1" + sides "LR" = B1 on the left, C1 on the right (old codes: one letter for all its sides)
+const letsOf=p=>String(p[0]||'').match(/[A-Z]\d?/g)||[String(p[0]||'')];
+const faceLets=(out,side)=>[...new Set(D.parts.filter(p=>isOut(p)===out).flatMap(p=>{ const L=letsOf(p), sd=String(p[4]||''); return [...sd].map((c,i)=>c===side?(L[i]||L[0]):null).filter(Boolean); }))].join(' ');
 // real drawing seen from inside with the inside letters, and the mirrored drawing seen from outside with A1, B1…
 function picture(){
   const one=(mirror)=>{ const lets=side=>faceLets(mirror,side); let L=lets('L'),R=lets('R'); if(mirror)[L,R]=[R,L];
     return `<div class="pic${mirror?' out':''}"><div class="pt">${esc(lets('T'))}</div><div class="pm"><span>${esc(L)}</span><div class="pw">${mirror
       ? `<img src="img/${D.img}-out.jpg" alt="" onerror="this.onerror=null;this.src='img/${D.img}.jpg';this.style.transform='scaleX(-1)'"><b class="plbl">${esc(D.code)}</b>`
       : `<img src="img/${D.img}.jpg" alt="" onerror="this.closest('.pics').outerHTML=views()">`}</div><span>${esc(R)}</span></div><div class="pt">${esc(lets('B'))}</div></div>`; };
-  return `<div class="pics">${one(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div>${one(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div></div>`;
+  return `<div class="pics">${one(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div>${one(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div></div>`; // outside first, then inside
 }
 function drawing(out){ // frame to scale, letters on the side where each piece goes (inside view, or mirrored outside view)
   const W=+D.W||1000,H=+D.H||1000,box=180,s=box/Math.max(W,H),rw=W*s,rh=H*s,x=(300-rw)/2,y=(300-rh)/2;
@@ -107,18 +110,18 @@ function drawing(out){ // frame to scale, letters on the side where each piece g
     ${Rr?`<line x1="${x+rw+10}" y1="${y}" x2="${x+rw+10}" y2="${y+rh}" stroke="${C}" stroke-width="6" stroke-linecap="round"/><text x="${x+rw+18}" y="${y+rh/2+6}" text-anchor="start" font-size="18" font-weight="800" fill="${C}">${Rr}</text>`:''}
   </svg>`;
 }
-const views=()=>`${drawing(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div>${drawing(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div>`;
+const views=()=>`${drawing(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div>${drawing(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div>`;
 const nf=n=>n===0.5?'½':String(n);
 function render(){
   const t=T[lang]; document.documentElement.lang=lang; document.documentElement.dir=lang==='ar'?'rtl':'ltr';
   const langs=`<div class="langs">${['nl','tr','ar','en'].map(l=>`<button data-l="${l}" aria-pressed="${l===lang}">${l.toUpperCase()}</button>`).join('')}</div>`;
   const brand=`<div class="brand"><span><b>LANDSLAKE</b> Kozijnen &amp; Gevelbouw</span>${langs}</div>`;
   if(!D||D.bad){ document.getElementById('app').innerHTML=brand+`<div class="card empty">${esc(D&&D.bad?t.bad:t.none)}</div>`; return; }
-  const row=p=>`<div class="part"><div class="let${isOut(p)?' out':''}">${esc(p[0])}</div>
-      <div><div class="pname">${esc(p[1])}</div><div class="chips">${[...String(p[4]||'')].filter(c=>'LRTB'.includes(c)).map(c=>`<span class="chip">${esc(t[c])}</span>`).join('')}</div>${p[5]?`<div class="note">${esc(p[5])}</div>`:p[3]===0.5?`<div class="note">${esc(t.half)}</div>`:''}</div>
-      <div class="right"><div class="len">${p[2]!=null?esc(p[2])+' <small>mm</small>':`<small>${esc(t.tbd)}</small>`}</div><div class="qty">× ${esc(nf(p[3]))}</div></div></div>`;
+  const row=p=>{ const L=letsOf(p), many=L.length>1&&L.length===String(p[4]||'').length; return `<div class="part"><div class="let${isOut(p)?' out':''}${L.length>1?' many':''}">${esc(L.join(' '))}</div>
+      <div><div class="pname">${esc(p[1])}</div><div class="chips">${[...String(p[4]||'')].filter(c=>'LRTB'.includes(c)).map(c=>isOut(p)?({L:'R',R:'L'}[c]||c):c).map(c=>`<span class="chip">${esc(t[c])}</span>`).join('')}</div>${p[5]?`<div class="note">${esc(p[5])}</div>`:p[3]===0.5?`<div class="note">${esc(t.half)}</div>`:''}</div>
+      <div class="right"><div class="len">${p[2]!=null?esc(p[2])+' <small>mm</small>':`<small>${esc(t.tbd)}</small>`}</div><div class="qty">× ${esc(many?(L.length+' × '+nf(p[3])):nf(p[3]))}</div></div></div>`; };
   const pin=D.parts.filter(p=>!isOut(p)), pout=D.parts.filter(isOut);
-  const parts=(pout.length?`<div class="face">👁 ${esc(t.inH)}</div>`:'')+pin.map(row).join('')+(pout.length?`<div class="face out">👁 ${esc(t.outH)}</div>`+pout.map(row).join(''):'');
+  const parts=(pout.length?`<div class="face out">👁 ${esc(t.outH)}</div>`+pout.map(row).join(''):'')+(pout.length?`<div class="face">👁 ${esc(t.inH)}</div>`:'')+pin.map(row).join('');
   const mats=D.mats.map(m=>`<div class="mat"><span>${esc(m[0])}</span><b>× ${esc(m[1])}</b></div>`).join('')+(D.vent?`<div class="mat"><span>🌬 ${esc(t.vent)}: ${esc(D.vent)}</span><b>× 1</b></div>`:'');
   document.getElementById('app').innerHTML=brand+`
     <div class="card"><div class="head"><div><div class="code">${esc(D.code)}</div><div class="size">${esc(D.W||'?')} × ${esc(D.H||'?')} mm</div></div>
