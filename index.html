@@ -37,6 +37,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",sy
 .pic .pt{font-size:1.1rem;min-height:1.3em;letter-spacing:.12em}
 .pic.out{color:#c2410c}
 .draw .seen.out{color:#c2410c}
+.v3 .draw .seen{color:#c00000;font-weight:800}.v3 .draw .seen.out{color:var(--glass)}
+.v3 .pic{color:#c00000}.v3 .pic.out{color:var(--glass)}
+.pdash{border-top:2.5px dashed var(--frame);margin:4px 30px 0}
+.v3 .let{background:#c00000}.v3 .let.out{background:var(--glass)}
+.v3 .face{background:#fde8e8;color:#c00000}.v3 .face.out{background:var(--glass-soft);color:var(--ink)}
 .draw .seen{margin-bottom:10px}
 .let.out{background:#c2410c}
 .let.many{font-size:1rem;line-height:1.1;text-align:center;padding:2px}
@@ -64,10 +69,10 @@ h2{font-size:1rem;margin:0 0 8px}
 <div class="wrap" id="app"></div>
 <script>
 const T={
- nl:{inH:'Binnen: A boven · B links · C rechts · D onder · E onder vensterbank',outH:'Buiten: A1 boven · B1 links · C1 rechts · D1 onder',out:'Buitenaanzicht — AFDICHTING',half:'½ = 1 stuk voor 2 kozijnen (gehalveerd)',seen:'Binnenaanzicht / Afwerking — Finishing',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
- en:{inH:'Inside: A top · B left · C right · D bottom · E under the sill',outH:'Outside: A1 top · B1 left · C1 right · D1 bottom',out:'Buitenaanzicht — AFDICHTING (outside)',half:'½ = one piece for 2 frames (halved)',seen:'Binnenaanzicht / Afwerking — Finishing (inside)',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
- tr:{inH:'İç: A üst · B sol · C sağ · D alt · E denizlik altı',outH:'Dış: A1 üst · B1 sol · C1 sağ · D1 alt',out:'Buitenaanzicht — AFDICHTING (dış)',half:'½ = 2 kasa için 1 parça (ikiye bölünür)',seen:'Binnenaanzicht / Afwerking — Finishing (iç)',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
- ar:{inH:'جوّا: A فوق · B يسار · C يمين · D تحت · E تحت الـ Vensterbank',outH:'برّا: A1 فوق · B1 يسار · C1 يمين · D1 تحت',out:'Buitenaanzicht — AFDICHTING (من برّا)',half:'½ = قطعة وحدة لشباكين (بتنقسم)',seen:'Binnenaanzicht / Afwerking — Finishing (من جوّا)',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
+ nl:{inH:'Binnen — afwerking: A1 boven · B1 links · C1 rechts · D1 onder',outH:'Buiten — afdichting: A boven · B links · C rechts · D onder · E onder de stippellijn',out:'Buitenaanzicht — AFDICHTING',half:'½ = 1 stuk voor 2 kozijnen (gehalveerd)',seen:'Binnenaanzicht – Afwerking',parts:'Onderdelen voor dit kozijn',hw:'Beslag & materiaal',L:'Links',R:'Rechts',T:'Boven',B:'Onder',tbd:'lengte volgt',pos:'Pos',none:'Scan de QR-code op een pakket.',bad:'Deze QR-code kon niet gelezen worden.',vent:'Rooster'},
+ en:{inH:'Inside — afwerking: A1 top · B1 left · C1 right · D1 bottom',outH:'Outside — afdichting: A top · B left · C right · D bottom · E under the dashed line',out:'Buitenaanzicht — AFDICHTING (outside)',half:'½ = one piece for 2 frames (halved)',seen:'Binnenaanzicht – Afwerking (inside)',parts:'Parts for this frame',hw:'Hardware & materials',L:'Left',R:'Right',T:'Top',B:'Bottom',tbd:'length to follow',pos:'Pos',none:'Scan the QR code on a package.',bad:'This QR code could not be read.',vent:'Vent'},
+ tr:{inH:'İç — afwerking: A1 üst · B1 sol · C1 sağ · D1 alt',outH:'Dış — afdichting: A üst · B sol · C sağ · D alt · E kesik çizginin altı',out:'Buitenaanzicht — AFDICHTING (dış)',half:'½ = 2 kasa için 1 parça (ikiye bölünür)',seen:'Binnenaanzicht – Afwerking (iç)',parts:'Bu kasanın parçaları',hw:'Aksesuar ve malzeme',L:'Sol',R:'Sağ',T:'Üst',B:'Alt',tbd:'boy sonra',pos:'Poz',none:'Paketteki QR kodunu okutun.',bad:'Bu QR kod okunamadı.',vent:'Menfez'},
+ ar:{inH:'جوّا — Afwerking: A1 فوق · B1 يسار · C1 يمين · D1 تحت',outH:'برّا — Afdichting: A فوق · B يسار · C يمين · D تحت · E تحت الخط المتقطّع',out:'Buitenaanzicht — AFDICHTING (من برّا)',half:'½ = قطعة وحدة لشباكين (بتنقسم)',seen:'Binnenaanzicht – Afwerking (من جوّا)',parts:'قطع هالشباك',hw:'المسكات والمواد',L:'يسار',R:'يمين',T:'فوق',B:'تحت',tbd:'الطول بعدين',pos:'مكان',none:'صوّر رمز QR يلي على البكج.',bad:'ما قدرنا نقرا هالرمز.',vent:'تهوية'}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function decode(h){ // #<base64url of UTF-8 JSON>
   const b=h.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(b+'==='.slice((b.length+3)%4));
@@ -77,15 +82,15 @@ let D=null, lang='nl';
 // v2 (short): 2!lang!project!code!W!H!block!house!pos!qty!A~prof~len~n~sides,…!name~q,…!vent   ·  v1: base64 JSON
 const un=x=>decodeURIComponent(String(x||'').replace(/_/g,' '));
 function parse2(h){ const F=h.split('!'); const num=x=>x===''?null:(x==='.5'?0.5:+x);
-  return {v:2,lang:un(F[1]),project:un(F[2]),code:un(F[3]),W:un(F[4]),H:un(F[5]),b:un(F[6]),h:un(F[7]),pos:un(F[8]),qty:un(F[9]),
+  return {v:+F[0],lang:un(F[1]),project:un(F[2]),code:un(F[3]),W:un(F[4]),H:un(F[5]),b:un(F[6]),h:un(F[7]),pos:un(F[8]),qty:un(F[9]),
     parts:(F[10]?F[10].split(','):[]).map(x=>{ const q=x.split('~').map(un); return [q[0],q[1],q[2]===''?null:q[2],num(q[3]),q[4]]; }),
     mats:(F[11]?F[11].split(','):[]).map(x=>x.split('~').map(un)),vent:un(F[12]),img:/^[a-z0-9-]+\/[a-z0-9-]+$/.test(un(F[13]))?un(F[13]):'',type:''}; }
 try{ let h=location.hash.slice(1); try{ if(/%21|%7E/i.test(h)) h=decodeURIComponent(h); }catch(x){}
-  if(h){ if(/^2!/.test(h)) D=parse2(h); else { const a=decode(h); D={v:a[0],lang:a[1],project:a[2],code:a[3],W:a[4],H:a[5],b:a[6],h:a[7],pos:a[8],qty:a[9],parts:a[10]||[],mats:a[11]||[],vent:a[12]||'',type:a[13]||''}; }
+  if(h){ if(/^[23]!/.test(h)) D=parse2(h); else { const a=decode(h); D={v:a[0],lang:a[1],project:a[2],code:a[3],W:a[4],H:a[5],b:a[6],h:a[7],pos:a[8],qty:a[9],parts:a[10]||[],mats:a[11]||[],vent:a[12]||'',type:a[13]||''}; }
     lang=T[D.lang]?D.lang:'nl'; } }catch(e){ D={bad:true}; }
 try{ const l=localStorage.getItem('lm-lang'); if(T[l]) lang=l; }catch(e){}
 // letters ending in a digit (A1, B1…) are fitted on the outside, plain letters (A, B…) inside
-const isOut=p=>/\d/.test(String(p[0]||''));
+const isOut=p=>D&&D.v===3?!/\d/.test(String(p[0]||'')):/\d/.test(String(p[0]||''));
 // "B1C1" + sides "LR" = B1 on the left, C1 on the right (old codes: one letter for all its sides)
 const letsOf=p=>String(p[0]||'').match(/[A-Z]\d?/g)||[String(p[0]||'')];
 const faceLets=(out,side)=>[...new Set(D.parts.filter(p=>isOut(p)===out).flatMap(p=>{ const L=letsOf(p), sd=String(p[4]||''); return [...sd].map((c,i)=>c===side?(L[i]||L[0]):null).filter(Boolean); }))].join(' ');
@@ -94,15 +99,16 @@ function picture(){
   const one=(mirror)=>{ const lets=side=>faceLets(mirror,side); let L=lets('L'),R=lets('R'); if(mirror)[L,R]=[R,L];
     return `<div class="pic${mirror?' out':''}"><div class="pt">${esc(lets('T'))}</div><div class="pm"><span>${esc(L)}</span><div class="pw">${mirror
       ? `<img src="img/${D.img}-out.jpg" alt="" onerror="this.onerror=null;this.src='img/${D.img}.jpg';this.style.transform='scaleX(-1)'"><b class="plbl">${esc(D.code)}</b>`
-      : `<img src="img/${D.img}.jpg" alt="" onerror="this.closest('.pics').outerHTML=views()">`}</div><span>${esc(R)}</span></div><div class="pt">${esc(lets('B'))}</div></div>`; };
+      : `<img src="img/${D.img}.jpg" alt="" onerror="this.closest('.pics').outerHTML=views()">`}</div><span>${esc(R)}</span></div><div class="pt">${esc(lets('B'))}</div>${mirror&&D.v===3?`<div class="pdash"></div><div class="pt">${esc(lets('E')||'E')}</div>`:''}</div>`; };
   return `<div class="pics">${one(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div>${one(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div></div>`; // outside first, then inside
 }
 function drawing(out){ // frame to scale, letters on the side where each piece goes (inside view, or mirrored outside view)
-  const W=+D.W||1000,H=+D.H||1000,box=180,s=box/Math.max(W,H),rw=W*s,rh=H*s,x=(300-rw)/2,y=(300-rh)/2;
-  const lets=side=>faceLets(!!out,side), C=out?'#c2410c':'var(--glass)';
+  const W=+D.W||1000,H=+D.H||1000,box=180,s=box/Math.max(W,H),rw=W*s,rh=H*s,x=(300-rw)/2,y=(300-rh)/2-(out&&D.v===3?22:0);
+  const lets=side=>faceLets(!!out,side), C=D.v===3?(out?'var(--glass)':'#c00000'):(out?'#c2410c':'var(--glass)');
   const Tt=lets('T'),Bb=lets('B'); let Ll=lets('L'),Rr=lets('R'); if(out)[Ll,Rr]=[Rr,Ll];
   return `<svg viewBox="0 0 300 300" role="img" aria-label="${W} x ${H}" style="direction:ltr">
     <rect x="${x}" y="${y}" width="${rw}" height="${rh}" rx="2" fill="${out?'#fff3e6':'var(--glass-soft)'}" stroke="var(--frame)" stroke-width="5"${out?' stroke-dasharray="10 6"':''}/>
+    ${out&&D.v===3?`<line x1="${x-8}" y1="${y+rh+44}" x2="${x+rw+8}" y2="${y+rh+44}" stroke="var(--frame)" stroke-width="2.5" stroke-dasharray="9 6"/><text x="150" y="${y+rh+66}" text-anchor="middle" font-size="18" font-weight="800" fill="${C}">${faceLets(true,'E')||'E'}</text>`:''}
     <text x="150" y="${y+rh/2+5}" text-anchor="middle" font-size="13" fill="var(--muted)" style="direction:ltr">${W} × ${H}</text>
     ${Tt?`<line x1="${x}" y1="${y-10}" x2="${x+rw}" y2="${y-10}" stroke="${C}" stroke-width="6" stroke-linecap="round"/><text x="150" y="${y-20}" text-anchor="middle" font-size="18" font-weight="800" fill="${C}">${Tt}</text>`:''}
     ${Bb?`<line x1="${x}" y1="${y+rh+10}" x2="${x+rw}" y2="${y+rh+10}" stroke="${C}" stroke-width="6" stroke-linecap="round"/><text x="150" y="${y+rh+34}" text-anchor="middle" font-size="18" font-weight="800" fill="${C}">${Bb}</text>`:''}
@@ -113,7 +119,7 @@ function drawing(out){ // frame to scale, letters on the side where each piece g
 const views=()=>`${drawing(true)}<div class="seen out">👁 ${esc(T[lang].out)}</div>${drawing(false)}<div class="seen">👁 ${esc(T[lang].seen)}</div>`;
 const nf=n=>n===0.5?'½':String(n);
 function render(){
-  const t=T[lang]; document.documentElement.lang=lang; document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  const t=T[lang]; document.documentElement.lang=lang; document.body.classList.toggle('v3',!!D&&D.v===3); document.documentElement.dir=lang==='ar'?'rtl':'ltr';
   const langs=`<div class="langs">${['nl','tr','ar','en'].map(l=>`<button data-l="${l}" aria-pressed="${l===lang}">${l.toUpperCase()}</button>`).join('')}</div>`;
   const brand=`<div class="brand"><span><b>LANDSLAKE</b> Kozijnen &amp; Gevelbouw</span>${langs}</div>`;
   if(!D||D.bad){ document.getElementById('app').innerHTML=brand+`<div class="card empty">${esc(D&&D.bad?t.bad:t.none)}</div>`; return; }
