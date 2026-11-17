@@ -136,8 +136,18 @@ function render(){
     <div class="card draw">${D.img?picture():views()}</div>
     <div class="card"><h2>${esc(t.parts)}</h2>${parts}</div>
     ${mats?`<div class="card"><h2>${esc(t.hw)}</h2>${mats}</div>`:''}
+    <div id="drwLink"></div>
     <div class="foot">LANDSLAKE Kozijnen &amp; Gevelbouw · HAZEM ALHAMOUD</div>`;
+  drwLink();
 }
+// button to the project drawings (drw.html#<slug>) when that project has drawings online
+const pslug=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const DRWT={nl:'📐 Tekeningen van het project',en:'📐 Project drawings',tr:'📐 Proje çizimleri',ar:'📐 رسومات المشروع'};
+let drwOk=null;
+function drwLink(){ const el=document.getElementById('drwLink'), sl=pslug(D&&D.project); if(!el||!sl) return;
+  const show=()=>{ if(drwOk) el.innerHTML=`<a class="card" style="display:block;text-align:center;font-weight:800;font-size:1.1rem;color:var(--glass);text-decoration:none" href="drw.html#${sl}">${DRWT[lang]||DRWT.nl} ›</a>`; };
+  if(drwOk!==null) return show();
+  fetch(`drw/${sl}/index.json`,{cache:'no-cache'}).then(r=>{ drwOk=r.ok; show(); }).catch(()=>{ drwOk=false; }); }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-l]'); if(b){ lang=b.dataset.l; try{localStorage.setItem('lm-lang',lang);}catch(x){} render(); } });
 window.addEventListener('hashchange',()=>location.reload());
 render();
